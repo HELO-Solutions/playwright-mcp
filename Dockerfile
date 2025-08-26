@@ -114,8 +114,8 @@ websockify 6080 localhost:5900 &
 sleep 3
 
 echo "Starting Playwright MCP server..."
-# Start Playwright MCP server in headed mode
-exec node cli.js --browser chromium --no-sandbox "$@"
+# Start Playwright MCP server in headed mode with SSE on port 3333
+exec node cli.js --browser chromium --no-sandbox --port 3333 --host 0.0.0.0 "$@"
 EOF
 
 RUN chmod +x /start.sh
@@ -126,8 +126,8 @@ COPY --from=builder --chown=${USERNAME}:${USERNAME} /app/lib /app/lib
 
 USER ${USERNAME}
 
-# Expose VNC and WebSocket ports
-EXPOSE 5900 6080
+# Expose VNC, WebSocket, and MCP SSE ports
+EXPOSE 5900 6080 3333
 
 # Run with headed browser and VNC
 ENTRYPOINT ["/start.sh"]
