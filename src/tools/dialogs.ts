@@ -26,7 +26,9 @@ const handleDialog = defineTabTool({
     description: 'Handle a dialog',
     inputSchema: z.object({
       accept: z.boolean().describe('Whether to accept the dialog.'),
-      promptText: z.string().optional().describe('The text of the prompt in case of a prompt dialog.'),
+      // Provider compatibility: make promptText required to satisfy strict validators (e.g., GPT-5 via OpenRouter/Azure).
+      // For non-prompt dialogs, pass an empty string.
+      promptText: z.string().describe('The text to submit for a prompt dialog. Use empty string for non-prompt dialogs.'),
     }),
     type: 'destructive',
   },

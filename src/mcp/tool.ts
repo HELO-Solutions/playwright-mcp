@@ -28,10 +28,26 @@ export type ToolSchema<Input extends z.Schema> = {
 };
 
 export function toMcpTool(tool: ToolSchema<any>): mcpServer.Tool {
+  const jsonSchema = zodToJsonSchema(tool.inputSchema, { strictUnions: true }) as mcpServer.Tool['inputSchema'];
+
+  // Provider compatibility: some providers require `required` to list every property key.
+  // Normalize the root object schema to include all property keys in `required`.
+  if (
+    jsonSchema &&
+    typeof jsonSchema === 'object' &&
+    (jsonSchema as any).type === 'object' &&
+    (jsonSchema as any).properties &&
+    typeof (jsonSchema as any).properties === 'object'
+  ) {
+    const propertyKeys = Object.keys((jsonSchema as any).properties);
+    if (propertyKeys.length > 0)
+      (jsonSchema as any).required = propertyKeys;
+  }
+
   return {
     name: tool.name,
     description: tool.description,
-    inputSchema: zodToJsonSchema(tool.inputSchema, { strictUnions: true }) as mcpServer.Tool['inputSchema'],
+    inputSchema: jsonSchema,
     annotations: {
       title: tool.title,
       readOnlyHint: tool.type === 'readOnly',
