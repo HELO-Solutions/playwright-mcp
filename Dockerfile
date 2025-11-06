@@ -115,7 +115,8 @@ sleep 3
 
 echo "Starting Playwright MCP server..."
 # Start Playwright MCP server in headed mode with SSE on port 3333
-exec node cli.js --browser chromium --no-sandbox --port 3333 --host 0.0.0.0 "$@"
+# --isolated flag prevents "Browser is already in use" errors with multiple connections
+exec node cli.js --browser chromium --no-sandbox --isolated --port 3333 --host 0.0.0.0 "$@"
 EOF
 
 RUN chmod +x /start.sh
